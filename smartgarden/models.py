@@ -1,10 +1,11 @@
 from enum import Enum
 
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.models import UserManager, PermissionsMixin
 from django.db import models
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
     class UserType(Enum):
@@ -21,6 +22,18 @@ class User(AbstractBaseUser):
     email = models.EmailField(verbose_name='email address', unique=True)
     username = models.TextField(verbose_name="user name", null=True)
     user_type = models.CharField(choices=USER_TYPE_CHOICES, default='USER', null=False, max_length=255)
+
+    objects = UserManager()
+
+    @property
+    def is_staff(self) -> bool:
+        return bool(self.user_type == self.UserType.ADMIN.value)
+
+    def has_module_perms(self, app_label):
+        return self.is_staff
+
+    def has_perm(self, perm, obj=None):
+        return self.is_staff
 
 
 class Circuit(models.Model):
