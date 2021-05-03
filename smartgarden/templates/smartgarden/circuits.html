@@ -1,0 +1,29 @@
+{% extends "smartgarden/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+
+    {% if circuits %}
+        {% for circuit in circuits %}
+            <div id="circuit_{{ circuit.id }}" class="card" style="width: 18rem;">
+                <div class="card-header">
+                    {{ circuit.name }}
+                </div>
+                {% if circuit.schedule %}
+                    <ul class="list-group">
+                        {% for scheduled_activation in circuit.schedule %}
+                            <li class="list-group-item">{{ scheduled_activation.time }}, {{ scheduled_activation.amount }}, {{ scheduled_activation.active }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>circuits no available</p>
+    {% endif %}
+
+    </div>
+</div>
+
+{% endblock content %}
