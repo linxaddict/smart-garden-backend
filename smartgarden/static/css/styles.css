@@ -1,0 +1,47 @@
+body {
+  background-color: #f5f6fa;
+}
+
+.circuit-card {
+  border-radius: 10px;
+  padding: 15px;
+  background-color: white;
+}
+
+.circuit-card {
+  border-radius: 4px;
+  background: #white;
+  box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
+  transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
+  width: 300px;
+  min-height: 250px;
+}
+
+.circuit-status-healthy {
+  background-color: #65ba69;
+  width: 6px;
+  align-self: stretch;
+}
+
+.circuit-status-unhealthy {
+  background-color: #ef5350;
+  width: 6px;
+  align-self: stretch;
+}
+
+.circuit-card h3 {
+  font-weight: 600;
+}
+
+.circuit-card h5 {
+  color: #9eaaba;
+}
+
+.schedule-item {
+  font-weight: 400;
+  font-size: 18px;
+}
+
+.schedule-item-amount {
+  color: #0d47a1;
+}

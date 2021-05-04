@@ -6,21 +6,39 @@
 
     {% if circuits %}
         {% for circuit in circuits %}
-            <div id="circuit_{{ circuit.id }}" class="card" style="width: 18rem;">
-                <div class="card-header">
-                    {{ circuit.name }}
+            <div class="col">
+                <div id="circuit_{{ circuit.id }}" class="circuit-card d-flex p-4">
+                    {% if circuit.healthy %}
+                        <div class="align-self-stretch mr-4 circuit-status-healthy"></div>
+                    {% else %}
+                        <div class="align-self-stretch mr-4 circuit-status-unhealthy"></div>
+                    {% endif %}
+
+                    <div>
+                        <h3>
+                            {{ circuit.name }}
+                        </h3>
+                        <h5 class="mb-3">
+                            {{ circuit.active }}
+                        </h5>
+
+                        {% if circuit.schedule %}
+                            <div id="schedule">
+                                {% for scheduled_activation in circuit.schedule %}
+                                    <span class="d-block schedule-item">
+                                        {{ scheduled_activation.time }}, <span class="schedule-item-amount">{{ scheduled_activation.amount }} ml</span>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-                {% if circuit.schedule %}
-                    <ul class="list-group">
-                        {% for scheduled_activation in circuit.schedule %}
-                            <li class="list-group-item">{{ scheduled_activation.time }}, {{ scheduled_activation.amount }}, {{ scheduled_activation.active }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
             </div>
         {% endfor %}
     {% else %}
-        <p>circuits no available</p>
+        <div class="col">
+            <p>circuits no available</p>
+        </div>
     {% endif %}
 
     </div>

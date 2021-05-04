@@ -33,7 +33,7 @@ class ScheduledOneTimeActivationViewModel:
 class CircuitViewModel:
     id: int
     name: str
-    active: bool
+    active: str
     healthy: bool
     one_time_activation: Optional[ScheduledOneTimeActivationViewModel]
     schedule: List[ScheduledActivationViewModel]
@@ -41,7 +41,7 @@ class CircuitViewModel:
     def __init__(self, circuit: Circuit) -> None:
         self.id = circuit.id
         self.name = circuit.name
-        self.active = circuit.active
+        self.active = 'Active' if circuit.active else 'Inactive'
 
         if not circuit.health_check:
             self.healthy = False
