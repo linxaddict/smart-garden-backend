@@ -1,13 +1,20 @@
 {% extends "smartgarden/base.html" %}
 
 {% block content %}
+<nav class="navbar navbar-expand navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">Smart Garden</a>
+  </div>
+</nav>
+
 <div class="container">
     <div class="row">
 
     {% if circuits %}
-        {% for circuit in circuits %}
-            <div class="col">
-                <div id="circuit_{{ circuit.id }}" class="circuit-card d-flex p-4">
+        <div id="content-main" class="col d-flex justify-content-center align-items-center">
+
+            {% for circuit in circuits %}
+                <div id="circuit_{{ circuit.id }}" class="circuit-card d-flex p-4 mx-2">
                     {% if circuit.healthy %}
                         <div class="align-self-stretch mr-4 circuit-status-healthy"></div>
                     {% else %}
@@ -33,8 +40,9 @@
                         {% endif %}
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+
+        </div>
     {% else %}
         <div class="col">
             <p>circuits no available</p>
