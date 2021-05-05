@@ -42,6 +42,7 @@ class Circuit(models.Model):
     health_check = models.DateTimeField(verbose_name='health check', null=True)
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='circuits')
+    controller = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, related_name='controlled_circuit')
 
 
 class Activation(models.Model):
