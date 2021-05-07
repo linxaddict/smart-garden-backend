@@ -1,8 +1,12 @@
+import datetime
 from enum import Enum
 
+import pytz
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import UserManager, PermissionsMixin
+from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+
+from smartgarden.managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -27,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def is_staff(self) -> bool:
-        return bool(self.user_type == self.UserType.ADMIN.value)
+        return bool(self.user_type == self.UserType.ADMIN.value) or self.is_superuser
 
     def has_module_perms(self, app_label):
         return self.is_staff
@@ -43,6 +47,14 @@ class Circuit(models.Model):
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='circuits')
     controller = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, related_name='controlled_circuit')
+
+    @property
+    def healthy(self):
+        if self.health_check:
+            # noinspection PyTypeChecker
+            return (datetime.datetime.now(tz=pytz.UTC) - self.health_check).total_seconds() / 60 < 15
+        else:
+            return False
 
 
 class Activation(models.Model):
