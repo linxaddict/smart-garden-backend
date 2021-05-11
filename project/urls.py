@@ -16,9 +16,11 @@ Including another URLconf
 import debug_toolbar
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.authtoken import views
 
 urlpatterns = [
     path('', include('smartgarden.urls')),
     path('admin/', admin.site.urls),
+    path('api/auth/token', views.obtain_auth_token),
     path('__debug__/', include(debug_toolbar.urls)),
 ]

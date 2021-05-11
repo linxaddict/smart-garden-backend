@@ -68,6 +68,7 @@ class CircuitScheduleView(ListAPIView, UpdateAPIView):
     serializer_class = ScheduledActivationSerializer
     queryset = ScheduledActivation.objects.all()
     lookup_field = 'circuit_id'
+    permission_classes = [permissions.IsAuthenticated]
 
     @property
     def circuit_id(self):
@@ -99,6 +100,7 @@ class CircuitOneTimeActivationView(ListCreateAPIView):
     serializer_class = ScheduledOneTimeActivationSerializer
     queryset = ScheduledOneTimeActivation.objects.all()
     lookup_field = 'circuit_id'
+    permission_classes = [permissions.IsAuthenticated]
 
     @property
     def circuit_id(self):
