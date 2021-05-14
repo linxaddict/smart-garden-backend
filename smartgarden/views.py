@@ -9,7 +9,7 @@ from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView,
 from rest_framework.response import Response
 
 from smartgarden.models import Circuit, User, ScheduledOneTimeActivation, ScheduledActivation
-from smartgarden.serializers import UserSerializer, CircuitSerializer, ScheduledActivationSerializer, \
+from smartgarden.serializers import CircuitSerializer, ScheduledActivationSerializer, \
     ScheduledOneTimeActivationSerializer
 from smartgarden.view_models import CircuitViewModel
 
@@ -19,16 +19,6 @@ def index(request):
         'circuits': [CircuitViewModel(c) for c in Circuit.objects.all()]
     }
     return render(request, 'smartgarden/circuits.html', context)
-
-
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User \
-        .objects \
-        .select_related('controlled_circuit') \
-        .all()
-
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
 class CircuitViewSet(viewsets.ReadOnlyModelViewSet):
@@ -41,7 +31,6 @@ class CircuitViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Circuit \
         .objects \
-        .select_related('controller') \
         .prefetch_related(one_time_activations_prefetch) \
         .prefetch_related('schedule') \
         .all()
@@ -75,7 +64,7 @@ class CircuitScheduleView(ListAPIView, UpdateAPIView):
         return self.kwargs[self.lookup_field]
 
     def get_queryset(self):
-        return self.queryset.filter(circuit_id=self.circuit_id)
+        return self.queryset.filter(circuit_id=self.circuit_id).order_by('-time')
 
     def put(self, request, *args, **kwargs):
         serializer = self.get_serializer(

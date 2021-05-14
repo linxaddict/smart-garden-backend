@@ -10,18 +10,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ActivationSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S')
+
     class Meta:
         model = Activation
         fields = ['amount', 'timestamp']
 
 
 class ScheduledOneTimeActivationSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S')
+
     class Meta:
         model = ScheduledOneTimeActivation
         fields = ['amount', 'timestamp']
 
 
 class ScheduledActivationSerializer(serializers.ModelSerializer):
+    time = serializers.DateTimeField(format='%H:%M:%S')
+
     class Meta:
         model = ScheduledActivation
         fields = ['active', 'amount', 'time']

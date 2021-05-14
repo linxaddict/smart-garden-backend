@@ -5,7 +5,6 @@ from . import views
 from .views import ControlledCircuitView, CircuitScheduleView, CircuitOneTimeActivationView
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
 router.register(r'circuits', views.CircuitViewSet)
 
 urlpatterns = [
