@@ -24,7 +24,8 @@ def create_circuit(owner: User, **kwargs) -> Circuit:
         name=kwargs.pop('name', 'TestCircuit'),
         active=kwargs.pop('active', True),
         health_check=kwargs.pop('active', datetime.datetime.now(tz=pytz.UTC)),
-        owner=owner
+        owner=owner,
+        **kwargs
     )
 
     return circuit

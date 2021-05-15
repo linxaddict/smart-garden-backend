@@ -6,6 +6,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, ListCreateAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from smartgarden.models import Circuit, User, ScheduledOneTimeActivation, ScheduledActivation
@@ -36,11 +37,12 @@ class CircuitViewSet(viewsets.ReadOnlyModelViewSet):
         .all()
 
     serializer_class = CircuitSerializer
+    permission_classes = [AllowAny]
 
 
 class ControlledCircuitView(RetrieveAPIView):
     serializer_class = CircuitSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = []
 
     def get(self, request, *args, **kwargs):
         try:

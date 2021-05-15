@@ -20,7 +20,7 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
         self.factory = APIRequestFactory()
         self.url = reverse('circuit-list')
 
-    def test_fetch_many_circuits_unauthorized(self):
+    def test_fetch_many_circuits_unauthenticated(self):
         request = self.factory.get(self.url, format='json')
         response = self.view(request)
 
