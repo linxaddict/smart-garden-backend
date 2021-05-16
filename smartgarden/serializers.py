@@ -26,7 +26,7 @@ class ScheduledOneTimeActivationSerializer(serializers.ModelSerializer):
 
 
 class ScheduledActivationSerializer(serializers.ModelSerializer):
-    time = serializers.DateTimeField(format='%H:%M:%S')
+    time = serializers.TimeField(format='%H:%M:%S')
 
     class Meta:
         model = ScheduledActivation

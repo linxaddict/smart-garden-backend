@@ -12,6 +12,6 @@ urlpatterns = [
     path('api/circuits/mine', ControlledCircuitView.as_view(), name='mine-circuit'),
     path('api/circuits/<int:circuit_id>/schedule', CircuitScheduleView.as_view(), name='circuit-schedule'),
     path('api/circuits/<int:circuit_id>/one-time-activations', CircuitOneTimeActivationView.as_view(),
-         name='circuit-schedule'),
+         name='circuit-one-time-activations'),
     path('', views.index, name='index'),
 ]

@@ -1,3 +1,5 @@
+from typing import List
+
 from smartgarden.models import Circuit, ScheduledOneTimeActivation, ScheduledActivation
 
 
@@ -30,3 +32,7 @@ class CommonAsserts:
         self.assertEqual(data.get('active'), activation.active)
         self.assertEqual(data.get('amount'), activation.amount)
         self.assertEqual(data.get('time'), activation.time.strftime('%H:%M:%S'))
+
+    def assertScheduleEqual(self, data: List[dict], schedule: List[ScheduledActivation]):
+        for ad, a in zip(data, schedule):
+            self.assertScheduledActivationEqual(ad, a)

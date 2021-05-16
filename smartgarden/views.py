@@ -42,7 +42,6 @@ class CircuitViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ControlledCircuitView(RetrieveAPIView):
     serializer_class = CircuitSerializer
-    # permission_classes = []
 
     def get(self, request, *args, **kwargs):
         try:

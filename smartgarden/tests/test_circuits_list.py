@@ -40,6 +40,8 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
         force_authenticate(request, self.user)
         response = self.view(request)
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         self.assertCircuitEqual(response.data[0], c1)
         self.assertCircuitEqual(response.data[1], c2)
 
@@ -50,6 +52,8 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
         request = self.factory.get(self.url, format='json')
         force_authenticate(request, self.user)
         response = self.view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertListEqual([], response.data[0].get('today_one_time_activations'))
         self.assertListEqual([], response.data[0].get('schedule'))
@@ -73,6 +77,8 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
         request = self.factory.get(self.url, format='json')
         force_authenticate(request, self.user)
         response = self.view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertListEqual([], response.data[0].get('today_one_time_activations'))
         self.assertListEqual([], response.data[0].get('schedule'))

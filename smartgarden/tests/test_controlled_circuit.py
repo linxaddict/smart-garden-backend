@@ -48,4 +48,4 @@ class ControlledCircuitViewTest(APITestCase, CommonAsserts):
         request = self.factory.get(self.url, format='json')
         response = self.view(request)
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
