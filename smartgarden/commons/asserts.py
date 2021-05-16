@@ -36,3 +36,7 @@ class CommonAsserts:
     def assertScheduleEqual(self, data: List[dict], schedule: List[ScheduledActivation]):
         for ad, a in zip(data, schedule):
             self.assertScheduledActivationEqual(ad, a)
+
+    def assertOneTimeActivationsEqual(self, data: List[dict], activations: List[ScheduledOneTimeActivation]):
+        for ad, a in zip(data, activations):
+            self.assertOneTimeActivationEqual(ad, a)
