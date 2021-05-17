@@ -3,13 +3,15 @@ import datetime
 from django.db import transaction
 from django.db.models import Prefetch
 from django.shortcuts import render
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, ListCreateAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from smartgarden.mixins import ExtractCircuitMixin
 from smartgarden.models import Circuit, User, ScheduledOneTimeActivation, ScheduledActivation
+from smartgarden.permissions import IsCircuitOwnerOnUnsafeOperations
 from smartgarden.serializers import CircuitSerializer, ScheduledActivationSerializer, \
     ScheduledOneTimeActivationSerializer
 from smartgarden.view_models import CircuitViewModel
@@ -54,15 +56,11 @@ class ControlledCircuitView(RetrieveAPIView):
             raise NotFound(detail="circuit not assigned", code=404)
 
 
-class CircuitScheduleView(ListAPIView, UpdateAPIView):
+class CircuitScheduleView(ListAPIView, UpdateAPIView, ExtractCircuitMixin):
     serializer_class = ScheduledActivationSerializer
     queryset = ScheduledActivation.objects.all()
     lookup_field = 'circuit_id'
-    permission_classes = [permissions.IsAuthenticated]
-
-    @property
-    def circuit_id(self):
-        return self.kwargs[self.lookup_field]
+    permission_classes = [IsAuthenticated & IsCircuitOwnerOnUnsafeOperations]
 
     def get_queryset(self):
         return self.queryset.filter(circuit_id=self.circuit_id).order_by('-time')
@@ -86,15 +84,11 @@ class CircuitScheduleView(ListAPIView, UpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CircuitOneTimeActivationView(ListCreateAPIView):
+class CircuitOneTimeActivationView(ListCreateAPIView, ExtractCircuitMixin):
     serializer_class = ScheduledOneTimeActivationSerializer
     queryset = ScheduledOneTimeActivation.objects.all()
     lookup_field = 'circuit_id'
-    permission_classes = [permissions.IsAuthenticated]
-
-    @property
-    def circuit_id(self):
-        return self.kwargs[self.lookup_field]
+    permission_classes = [IsAuthenticated & IsCircuitOwnerOnUnsafeOperations]
 
     def get_queryset(self):
         return self.queryset \

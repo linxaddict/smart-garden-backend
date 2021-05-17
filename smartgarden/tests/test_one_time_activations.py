@@ -19,12 +19,6 @@ class CircuitOneTimeActivationViewTest(APITestCase, CommonAsserts):
         self.factory = APIRequestFactory()
         self.url = reverse('circuit-one-time-activations', kwargs={'circuit_id': self.circuit.pk})
 
-    def test_fetch_unauthenticated(self):
-        request = self.factory.get(self.url, format='json')
-        response = self.view(request, circuit_id=self.circuit.pk)
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
     def test_fetch(self):
         today = datetime.datetime.now(tz=pytz.UTC)
         tomorrow = today + datetime.timedelta(days=1)
@@ -49,6 +43,30 @@ class CircuitOneTimeActivationViewTest(APITestCase, CommonAsserts):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data, [])
 
+    def test_fetch_unauthenticated(self):
+        request = self.factory.get(self.url, format='json')
+        response = self.view(request, circuit_id=self.circuit.pk)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_fetch_circuit_not_owned(self):
+        today = datetime.datetime.now(tz=pytz.UTC)
+        tomorrow = today + datetime.timedelta(days=1)
+        yesterday = today - + datetime.timedelta(days=1)
+
+        create_scheduled_one_time_activation(self.circuit, timestamp=yesterday)
+        s2 = create_scheduled_one_time_activation(self.circuit, timestamp=today)
+        create_scheduled_one_time_activation(self.circuit, timestamp=tomorrow)
+
+        user2 = create_user(email="user2@test.com")
+
+        request = self.factory.get(self.url, format='json')
+        force_authenticate(request, user2)
+        response = self.view(request, circuit_id=self.circuit.pk)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertOneTimeActivationsEqual(response.data, [s2])
+
     def test_post(self):
         today = datetime.datetime.now(tz=pytz.UTC)
 
@@ -68,6 +86,22 @@ class CircuitOneTimeActivationViewTest(APITestCase, CommonAsserts):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertOneTimeActivationEqual(data, activation)
+
+    def test_post_circuit_not_owned(self):
+        today = datetime.datetime.now(tz=pytz.UTC)
+
+        data = {
+            'amount': 200,
+            'timestamp': today.strftime('%Y-%m-%dT%H:%M:%S')
+        }
+
+        user2 = create_user(email="user2@test.com")
+
+        request = self.factory.post(self.url, data=data, format='json')
+        force_authenticate(request, user2)
+        response = self.view(request, circuit_id=self.circuit.pk)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_post_unauthenticated(self):
         today = datetime.datetime.now(tz=pytz.UTC)

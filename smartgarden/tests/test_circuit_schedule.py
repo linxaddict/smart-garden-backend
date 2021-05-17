@@ -49,6 +49,24 @@ class CircuitScheduleViewTest(APITestCase, CommonAsserts):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data, [])
 
+    def test_fetch_circuit_not_owned(self):
+        today = datetime.datetime.now(tz=pytz.UTC)
+        tomorrow = today + datetime.timedelta(days=1)
+        yesterday = today - + datetime.timedelta(days=1)
+
+        s1 = create_scheduled_activation(self.circuit, timestamp=yesterday)
+        s2 = create_scheduled_activation(self.circuit, timestamp=today)
+        s3 = create_scheduled_activation(self.circuit, timestamp=tomorrow)
+
+        user2 = create_user(email="user2@test.com")
+
+        request = self.factory.get(self.url, format='json')
+        force_authenticate(request, user2)
+        response = self.view(request, circuit_id=self.circuit.pk)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertScheduleEqual(response.data, [s1, s2, s3])
+
     def test_put(self):
         today = datetime.datetime.now(tz=pytz.UTC)
         tomorrow = today + datetime.timedelta(days=1)
@@ -117,6 +135,31 @@ class CircuitScheduleViewTest(APITestCase, CommonAsserts):
         ]
 
         request = self.factory.put(self.url, data=data, format='json')
+        response = self.view(request, circuit_id=self.circuit.pk)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_put_circuit_not_owned(self):
+        today = datetime.datetime.now(tz=pytz.UTC)
+        tomorrow = today + datetime.timedelta(days=1)
+        yesterday = today - + datetime.timedelta(days=1)
+
+        create_scheduled_activation(self.circuit, timestamp=yesterday)
+        create_scheduled_activation(self.circuit, timestamp=today)
+        create_scheduled_activation(self.circuit, timestamp=tomorrow)
+
+        data = [
+            {
+                'active': False,
+                'amount': 200,
+                'time': '21:00:49'
+            }
+        ]
+
+        user2 = create_user(email="user2@test.com")
+
+        request = self.factory.put(self.url, data=data, format='json')
+        force_authenticate(request, user2)
         response = self.view(request, circuit_id=self.circuit.pk)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
