@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 
 import environ
+import django_heroku
 
 root = environ.Path(__file__) - 3
 env = environ.Env()
@@ -141,3 +142,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
