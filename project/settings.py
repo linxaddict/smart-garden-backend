@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 
 import environ
-import django_heroku
 
 root = environ.Path(__file__) - 3
 env = environ.Env()
@@ -31,7 +30,7 @@ SECRET_KEY = env.str('SECRET_KEY', default='development_key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['app', 'localhost', '.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['app', 'localhost', '127.0.0.1', '.herokuapp.com']
 AUTH_USER_MODEL = 'smartgarden.User'
 
 # Application definition
@@ -142,6 +141,3 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Activate Django-Heroku.
-django_heroku.settings(locals())
