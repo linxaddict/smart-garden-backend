@@ -13,7 +13,7 @@ executors:
 
 jobs:
   build:
-    executor: python-executor
+    executor: machine
     steps:
       - checkout
 
