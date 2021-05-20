@@ -1,4 +1,4 @@
-version: 2.1
+version: 2.0
 
 executors:
   python-executor:
@@ -31,8 +31,31 @@ jobs:
           path: test-reports
           destination: test-reports
 
+  deploy:
+    executor: python-executor
+    steps:
+      - checkout
+      - run:
+          name: Setup Heroku
+          command: bash .circleci/setup-heroku.sh
+
+      - run:
+          name: Push To Heroku
+          command: |
+            git push heroku master:master
+            heroku run python manage.py migrate
+            sleep 5
+            heroku restart
+
 workflows:
-  version: 2.1
+  version: 2
   build:
     jobs:
       - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
