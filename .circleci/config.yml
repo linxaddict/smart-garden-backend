@@ -1,4 +1,4 @@
-version: 2.0
+version: 2.1
 
 executors:
   python-executor:
@@ -13,7 +13,7 @@ executors:
 
 jobs:
   build:
-    executor: machine
+    executor: python-executor
     steps:
       - checkout
 
