@@ -30,7 +30,7 @@ SECRET_KEY = env.str('SECRET_KEY', default='development_key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['app', 'localhost', '127.0.0.1', '.herokuapp.com']
+ALLOWED_HOSTS = ['app', 'localhost', '127.0.0.1', '.herokuapp.com', '.ogrodnabalkonie.pl']
 AUTH_USER_MODEL = 'smartgarden.User'
 
 # Application definition
