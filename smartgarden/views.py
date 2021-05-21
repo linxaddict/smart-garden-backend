@@ -2,7 +2,9 @@ import datetime
 
 from django.db import transaction
 from django.db.models import Prefetch
+from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.decorators.http import require_GET
 from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, ListCreateAPIView
@@ -22,6 +24,12 @@ def index(request):
         'circuits': [CircuitViewModel(c) for c in Circuit.objects.all()]
     }
     return render(request, 'smartgarden/circuits.html', context)
+
+
+@require_GET
+def acme_challenge(request):
+    return HttpResponse('AN2gxTItG3P8FliBhGOTJoaftesMcoHGjW3ZLyk3Qq4.8iFwP3UHTlvEx3q_oFmTHoNLY0olLjD22R-anwfxjGQ',
+                        content_type="text/plain")
 
 
 class CircuitViewSet(viewsets.ReadOnlyModelViewSet):
