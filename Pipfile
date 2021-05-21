@@ -10,6 +10,7 @@ django-debug-toolbar = "*"
 django-environ = "*"
 psycopg2-binary = "*"
 gunicorn = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
