@@ -28,7 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     email = models.EmailField(verbose_name='email address', unique=True)
-    username = models.TextField(verbose_name="user name", null=True)
+    username = models.TextField(verbose_name="user name", null=True, blank=True)
     user_type = models.CharField(choices=USER_TYPE_CHOICES, default='USER', null=False, max_length=255)
 
     objects = UserManager()
@@ -53,10 +53,11 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 class Circuit(models.Model):
     name = models.TextField(verbose_name='circuit name', null=False)
     active = models.BooleanField(verbose_name='active', null=False)
-    health_check = models.DateTimeField(verbose_name='health check', null=True)
+    health_check = models.DateTimeField(verbose_name='health check', null=True, blank=True)
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='circuits')
-    controller = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, related_name='controlled_circuit')
+    controller = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                      related_name='controlled_circuit')
 
     @property
     def healthy(self):
