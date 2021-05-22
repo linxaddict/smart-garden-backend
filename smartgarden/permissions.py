@@ -11,3 +11,14 @@ class IsCircuitOwnerOnUnsafeOperations(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return view.circuit.owner.pk == obj.pk
+
+
+class IsCircuitCollaboratorOnUnsafeOperations(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        else:
+            return view.circuit.collaborators.filter(pk=request.user.pk).exists()
+
+    def has_object_permission(self, request, view, obj):
+        return view.circuit.owner.pk == obj.pk

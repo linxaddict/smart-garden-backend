@@ -2,13 +2,9 @@ import datetime
 from enum import Enum
 
 import pytz
-from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
 
 from smartgarden.managers import UserManager
 
@@ -44,12 +40,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.is_staff
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)
-
-
 class Circuit(models.Model):
     name = models.TextField(verbose_name='circuit name', null=False)
     active = models.BooleanField(verbose_name='active', null=False)
@@ -58,6 +48,8 @@ class Circuit(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='circuits')
     controller = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True,
                                       related_name='controlled_circuit')
+    collaborators = models.ManyToManyField(User, through='CircuitCollaboration',
+                                           related_name='related_circuits', blank=True)
 
     @property
     def healthy(self):
@@ -67,12 +59,26 @@ class Circuit(models.Model):
         else:
             return False
 
+    def __str__(self):
+        return f'[{self.pk}] {self.name}'
+
+
+class CircuitCollaboration(models.Model):
+    circuit = models.ForeignKey(Circuit, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user}, {self.circuit}'
+
 
 class Activation(models.Model):
     amount = models.IntegerField(verbose_name='amount', null=False)
     timestamp = models.DateTimeField(verbose_name='timestamp', null=False)
 
     circuit = models.ForeignKey(Circuit, on_delete=models.CASCADE, related_name='activations')
+
+    def __str__(self):
+        return f'{self.circuit}, {self.timestamp}, {self.amount}'
 
 
 class ScheduledOneTimeActivation(models.Model):
@@ -81,9 +87,15 @@ class ScheduledOneTimeActivation(models.Model):
 
     circuit = models.ForeignKey(Circuit, on_delete=models.CASCADE, related_name='one_time_activations')
 
+    def __str__(self):
+        return f'{self.circuit}, {self.timestamp}, {self.amount}'
+
 
 class ScheduledActivation(models.Model):
     active = models.BooleanField(verbose_name='active', null=False)
     amount = models.IntegerField(verbose_name='amount', null=False)
     time = models.TimeField(verbose_name='activation time', null=False)
     circuit = models.ForeignKey(Circuit, on_delete=models.CASCADE, related_name='schedule')
+
+    def __str__(self):
+        return f'{self.circuit}, {self.time}, {self.amount}'
