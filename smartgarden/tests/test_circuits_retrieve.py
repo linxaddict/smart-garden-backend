@@ -24,7 +24,7 @@ class CircuitViewSetRetrieveTest(APITestCase, CommonAsserts):
         request = self.factory.get(self.url, format='json')
         response = self.view(request)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_fetch(self):
         create_scheduled_one_time_activation(self.circuit)

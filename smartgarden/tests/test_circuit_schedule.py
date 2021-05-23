@@ -24,7 +24,7 @@ class CircuitScheduleViewTest(APITestCase, CommonAsserts):
         request = self.factory.get(self.url, format='json')
         response = self.view(request, circuit_id=self.circuit.pk)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_fetch(self):
         today = datetime.datetime.now(tz=pytz.UTC)
@@ -157,7 +157,7 @@ class CircuitScheduleViewTest(APITestCase, CommonAsserts):
         request = self.factory.put(self.url, data=data, format='json')
         response = self.view(request, circuit_id=self.circuit.pk)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_put_circuit_not_owned(self):
         today = datetime.datetime.now(tz=pytz.UTC)

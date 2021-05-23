@@ -48,7 +48,7 @@ class CircuitOneTimeActivationViewTest(APITestCase, CommonAsserts):
         request = self.factory.get(self.url, format='json')
         response = self.view(request, circuit_id=self.circuit.pk)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_fetch_circuit_not_related(self):
         today = datetime.datetime.now(tz=pytz.UTC)
@@ -157,4 +157,4 @@ class CircuitOneTimeActivationViewTest(APITestCase, CommonAsserts):
         request = self.factory.post(self.url, data=data, format='json')
         response = self.view(request, circuit_id=self.circuit.pk)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
