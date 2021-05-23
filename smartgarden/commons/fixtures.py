@@ -19,12 +19,11 @@ def create_user(**kwargs) -> User:
     return user
 
 
-def create_circuit(owner: User, **kwargs) -> Circuit:
+def create_circuit(**kwargs) -> Circuit:
     circuit = Circuit.objects.create(
         name=kwargs.pop('name', 'TestCircuit'),
         active=kwargs.pop('active', True),
         health_check=kwargs.pop('active', datetime.datetime.now(tz=pytz.UTC)),
-        owner=owner,
         **kwargs
     )
 

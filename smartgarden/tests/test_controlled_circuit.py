@@ -15,7 +15,7 @@ class ControlledCircuitViewTest(APITestCase, CommonAsserts):
         self.url = reverse('mine-circuit')
 
     def test_fetched_controlled_circuit_owner_is_the_controller(self):
-        circuit = create_circuit(owner=self.user, name='c1', controller=self.user)
+        circuit = create_circuit(name='c1', controller=self.user)
 
         request = self.factory.get(self.url, format='json')
         force_authenticate(request, self.user)
@@ -25,7 +25,7 @@ class ControlledCircuitViewTest(APITestCase, CommonAsserts):
 
     def test_fetched_controlled_circuit_owner_is_not_the_controller(self):
         controller = create_user(email='controller@test.com')
-        circuit = create_circuit(owner=self.user, name='c1', controller=controller)
+        circuit = create_circuit(name='c1', controller=controller)
 
         request = self.factory.get(self.url, format='json')
         force_authenticate(request, controller)
@@ -34,7 +34,7 @@ class ControlledCircuitViewTest(APITestCase, CommonAsserts):
         self.assertCircuitEqual(response.data, circuit)
 
     def test_fetched_controlled_circuit_no_circuit_assigned(self):
-        create_circuit(owner=self.user, name='c1')
+        create_circuit(name='c1')
 
         request = self.factory.get(self.url, format='json')
         force_authenticate(request, self.user)
@@ -43,7 +43,7 @@ class ControlledCircuitViewTest(APITestCase, CommonAsserts):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_fetched_controlled_circuit_unauthenticated(self):
-        create_circuit(owner=self.user, name='c1')
+        create_circuit(name='c1')
 
         request = self.factory.get(self.url, format='json')
         response = self.view(request)

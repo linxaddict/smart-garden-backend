@@ -45,7 +45,6 @@ class Circuit(models.Model):
     active = models.BooleanField(verbose_name='active', null=False)
     health_check = models.DateTimeField(verbose_name='health check', null=True, blank=True)
 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='circuits')
     controller = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True,
                                       related_name='controlled_circuit')
     collaborators = models.ManyToManyField(User, through='CircuitCollaboration',

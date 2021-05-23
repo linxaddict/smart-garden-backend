@@ -24,11 +24,14 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
         request = self.factory.get(self.url, format='json')
         response = self.view(request)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_fetch_many_circuits(self):
-        c1 = create_circuit(owner=self.user, name='c1')
-        c2 = create_circuit(owner=self.user, name='c2')
+        c1 = create_circuit(name='c1')
+        c1.collaborators.add(self.user)
+        c2 = create_circuit(name='c2')
+        c2.collaborators.add(self.user)
+        create_circuit(name='c3')
 
         create_scheduled_one_time_activation(c1)
         create_scheduled_one_time_activation(c1)
@@ -42,12 +45,34 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        self.assertEqual(2, len(response.data))
         self.assertCircuitEqual(response.data[0], c1)
         self.assertCircuitEqual(response.data[1], c2)
 
+    def test_fetch_many_circuits_no_related(self):
+        c1 = create_circuit(name='c1')
+        create_circuit(name='c2')
+        create_circuit(name='c3')
+
+        create_scheduled_one_time_activation(c1)
+        create_scheduled_one_time_activation(c1)
+
+        create_scheduled_activation(c1)
+        create_scheduled_activation(c1)
+
+        request = self.factory.get(self.url, format='json')
+        force_authenticate(request, self.user)
+        response = self.view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(0, len(response.data))
+
     def test_fetch_many_circuits_no_activations_no_schedule(self):
-        c1 = create_circuit(owner=self.user, name='c1')
-        c2 = create_circuit(owner=self.user, name='c2')
+        c1 = create_circuit(name='c1')
+        c1.collaborators.add(self.user)
+        c2 = create_circuit(name='c2')
+        c2.collaborators.add(self.user)
+        create_circuit(name='c3')
 
         request = self.factory.get(self.url, format='json')
         force_authenticate(request, self.user)
@@ -55,6 +80,7 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        self.assertEqual(2, len(response.data))
         self.assertListEqual([], response.data[0].get('today_one_time_activations'))
         self.assertListEqual([], response.data[0].get('schedule'))
         self.assertListEqual([], response.data[1].get('today_one_time_activations'))
@@ -64,8 +90,11 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
         self.assertCircuitEqual(response.data[1], c2)
 
     def test_fetch_many_circuits_activations_not_for_today(self):
-        c1 = create_circuit(owner=self.user, name='c1')
-        c2 = create_circuit(owner=self.user, name='c2')
+        c1 = create_circuit(name='c1')
+        c1.collaborators.add(self.user)
+        c2 = create_circuit(name='c2')
+        c2.collaborators.add(self.user)
+        create_circuit(name='c3')
 
         today = datetime.datetime.now(tz=pytz.UTC)
         tomorrow = today + datetime.timedelta(days=1)
@@ -80,6 +109,7 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        self.assertEqual(2, len(response.data))
         self.assertListEqual([], response.data[0].get('today_one_time_activations'))
         self.assertListEqual([], response.data[0].get('schedule'))
         self.assertListEqual([], response.data[1].get('today_one_time_activations'))

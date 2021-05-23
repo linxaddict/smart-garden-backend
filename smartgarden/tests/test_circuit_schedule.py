@@ -13,7 +13,8 @@ from smartgarden.views import CircuitScheduleView
 class CircuitScheduleViewTest(APITestCase, CommonAsserts):
     def setUp(self):
         self.user = create_user()
-        self.circuit = create_circuit(owner=self.user, name='c1')
+        self.circuit = create_circuit(name='c1')
+        self.circuit.collaborators.add(self.user)
 
         self.view = CircuitScheduleView.as_view()
         self.factory = APIRequestFactory()

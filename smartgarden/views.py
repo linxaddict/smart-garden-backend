@@ -8,12 +8,12 @@ from django.views.decorators.http import require_GET
 from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, ListCreateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from smartgarden.mixins import ExtractCircuitMixin
 from smartgarden.models import Circuit, User, ScheduledOneTimeActivation, ScheduledActivation
-from smartgarden.permissions import IsCircuitOwnerOnUnsafeOperations, IsCircuitCollaboratorOnUnsafeOperations
+from smartgarden.permissions import IsCircuitCollaboratorOnUnsafeOperations
 from smartgarden.serializers import CircuitSerializer, ScheduledActivationSerializer, \
     ScheduledOneTimeActivationSerializer
 from smartgarden.view_models import CircuitViewModel
@@ -33,6 +33,10 @@ def acme_challenge(request):
 
 
 class CircuitViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = CircuitSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Circuit.objects.all()
+
     today_one_time_activations = ScheduledOneTimeActivation \
         .objects \
         .filter(timestamp__date=datetime.date.today()) \
@@ -40,14 +44,13 @@ class CircuitViewSet(viewsets.ReadOnlyModelViewSet):
 
     one_time_activations_prefetch = Prefetch('one_time_activations', today_one_time_activations)
 
-    queryset = Circuit \
-        .objects \
-        .prefetch_related(one_time_activations_prefetch) \
-        .prefetch_related('schedule') \
-        .all()
-
-    serializer_class = CircuitSerializer
-    permission_classes = [AllowAny]
+    def get_queryset(self):
+        return Circuit \
+            .objects \
+            .filter(collaborators__pk=self.request.user.pk) \
+            .prefetch_related(self.one_time_activations_prefetch) \
+            .prefetch_related('schedule') \
+            .all()
 
 
 class ControlledCircuitView(RetrieveAPIView):
@@ -69,8 +72,7 @@ class CircuitScheduleView(ListAPIView, UpdateAPIView, ExtractCircuitMixin):
     serializer_class = ScheduledActivationSerializer
     queryset = ScheduledActivation.objects.all()
     lookup_field = 'circuit_id'
-    permission_classes = [IsAuthenticated &
-                          (IsCircuitOwnerOnUnsafeOperations | IsCircuitCollaboratorOnUnsafeOperations)]
+    permission_classes = [IsAuthenticated & IsCircuitCollaboratorOnUnsafeOperations]
 
     def get_queryset(self):
         return self.queryset.filter(circuit_id=self.circuit_id).order_by('-time')
@@ -98,8 +100,7 @@ class CircuitOneTimeActivationView(ListCreateAPIView, ExtractCircuitMixin):
     serializer_class = ScheduledOneTimeActivationSerializer
     queryset = ScheduledOneTimeActivation.objects.all()
     lookup_field = 'circuit_id'
-    permission_classes = [IsAuthenticated &
-                          (IsCircuitOwnerOnUnsafeOperations | IsCircuitCollaboratorOnUnsafeOperations)]
+    permission_classes = [IsAuthenticated & IsCircuitCollaboratorOnUnsafeOperations]
 
     def get_queryset(self):
         return self.queryset \

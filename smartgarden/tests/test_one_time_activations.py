@@ -13,7 +13,8 @@ from smartgarden.views import CircuitOneTimeActivationView
 class CircuitOneTimeActivationViewTest(APITestCase, CommonAsserts):
     def setUp(self):
         self.user = create_user()
-        self.circuit = create_circuit(owner=self.user, name='c1')
+        self.circuit = create_circuit(name='c1')
+        self.circuit.collaborators.add(self.user)
 
         self.view = CircuitOneTimeActivationView.as_view()
         self.factory = APIRequestFactory()
@@ -49,7 +50,7 @@ class CircuitOneTimeActivationViewTest(APITestCase, CommonAsserts):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_fetch_circuit_not_owned(self):
+    def test_fetch_circuit_not_related(self):
         today = datetime.datetime.now(tz=pytz.UTC)
         tomorrow = today + datetime.timedelta(days=1)
         yesterday = today - + datetime.timedelta(days=1)
