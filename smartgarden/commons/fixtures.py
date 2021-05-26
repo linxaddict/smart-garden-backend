@@ -23,7 +23,7 @@ def create_circuit(**kwargs) -> Circuit:
     circuit = Circuit.objects.create(
         name=kwargs.pop('name', 'TestCircuit'),
         active=kwargs.pop('active', True),
-        health_check=kwargs.pop('active', datetime.datetime.now(tz=pytz.UTC)),
+        health_check=kwargs.pop('health_check', datetime.datetime.now(tz=pytz.UTC)),
         **kwargs
     )
 

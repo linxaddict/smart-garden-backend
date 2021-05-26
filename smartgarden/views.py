@@ -1,5 +1,6 @@
 import datetime
 
+import pytz
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponse
@@ -10,6 +11,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from smartgarden.mixins import ExtractCircuitMixin
 from smartgarden.models import Circuit, User, ScheduledOneTimeActivation, ScheduledActivation
@@ -61,6 +63,24 @@ class ControlledCircuitView(RetrieveAPIView):
         try:
             user = User.objects.get(pk=request.user.pk)
             circuit = user.controlled_circuit
+            serializer = self.serializer_class(circuit, many=False)
+
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        except Circuit.DoesNotExist:
+            raise NotFound(detail="circuit not assigned", code=404)
+
+
+class ControlledCircuitHealthCheckView(APIView):
+    serializer_class = CircuitSerializer
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        try:
+            user = User.objects.get(pk=request.user.pk)
+            circuit = user.controlled_circuit
+            circuit.health_check = datetime.datetime.now(tz=pytz.UTC)
+            circuit.save()
+
             serializer = self.serializer_class(circuit, many=False)
 
             return Response(status=status.HTTP_200_OK, data=serializer.data)
