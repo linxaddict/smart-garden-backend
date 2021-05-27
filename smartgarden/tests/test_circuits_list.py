@@ -81,9 +81,9 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(2, len(response.data))
-        self.assertListEqual([], response.data[0].get('today_one_time_activations'))
+        self.assertIsNone(response.data[0].get('one_time_activation'))
         self.assertListEqual([], response.data[0].get('schedule'))
-        self.assertListEqual([], response.data[1].get('today_one_time_activations'))
+        self.assertIsNone(response.data[1].get('one_time_activation'))
         self.assertListEqual([], response.data[1].get('schedule'))
 
         self.assertCircuitEqual(response.data[0], c1)
@@ -110,9 +110,9 @@ class CircuitViewSetTest(APITestCase, CommonAsserts):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(2, len(response.data))
-        self.assertListEqual([], response.data[0].get('today_one_time_activations'))
+        self.assertIsNone(response.data[0].get('one_time_activation'))
         self.assertListEqual([], response.data[0].get('schedule'))
-        self.assertListEqual([], response.data[1].get('today_one_time_activations'))
+        self.assertIsNone(response.data[1].get('one_time_activation'))
         self.assertListEqual([], response.data[1].get('schedule'))
 
         self.assertCircuitEqual(response.data[0], c1)

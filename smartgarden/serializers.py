@@ -34,9 +34,9 @@ class ScheduledActivationSerializer(serializers.ModelSerializer):
 
 
 class CircuitSerializer(serializers.ModelSerializer):
-    today_one_time_activations = ScheduledOneTimeActivationSerializer(source='one_time_activations', many=True)
+    one_time_activation = ScheduledOneTimeActivationSerializer()
     schedule = ScheduledActivationSerializer(many=True)
 
     class Meta:
         model = Circuit
-        fields = ['id', 'name', 'active', 'healthy', 'today_one_time_activations', 'schedule']
+        fields = ['id', 'name', 'active', 'healthy', 'one_time_activation', 'schedule']

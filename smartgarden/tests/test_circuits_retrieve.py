@@ -1,3 +1,6 @@
+import datetime
+
+import pytz
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
@@ -27,8 +30,15 @@ class CircuitViewSetRetrieveTest(APITestCase, CommonAsserts):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_fetch(self):
-        create_scheduled_one_time_activation(self.circuit)
-        create_scheduled_one_time_activation(self.circuit)
+        today = datetime.datetime.now(tz=pytz.UTC)
+        tomorrow = today + datetime.timedelta(days=1)
+        yesterday = today - datetime.timedelta(days=1)
+
+        create_scheduled_one_time_activation(self.circuit, timestamp=tomorrow)
+        create_scheduled_one_time_activation(self.circuit, timestamp=yesterday)
+        create_scheduled_one_time_activation(self.circuit, timestamp=today)
+        most_recent_activation = create_scheduled_one_time_activation(self.circuit,
+                                                                      timestamp=today + datetime.timedelta(minutes=5))
 
         create_scheduled_activation(self.circuit)
         create_scheduled_activation(self.circuit)
@@ -39,6 +49,7 @@ class CircuitViewSetRetrieveTest(APITestCase, CommonAsserts):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertCircuitEqual(response.data, self.circuit)
+        self.assertOneTimeActivationEqual(response.data['one_time_activation'], most_recent_activation)
 
     def test_fetch_not_related(self):
         create_scheduled_one_time_activation(self.circuit)

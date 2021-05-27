@@ -58,6 +58,16 @@ class Circuit(models.Model):
         else:
             return False
 
+    @property
+    def one_time_activation(self):
+        if not self.one_time_activations:
+            return None
+
+        return self.one_time_activations \
+            .filter(timestamp__date=datetime.date.today()) \
+            .order_by('-timestamp') \
+            .first()
+
     def __str__(self):
         return f'[{self.pk}] {self.name}'
 
