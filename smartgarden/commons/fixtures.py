@@ -2,7 +2,7 @@ import datetime
 
 import pytz
 
-from smartgarden.models import User, Circuit, Activation, ScheduledOneTimeActivation, ScheduledActivation
+from smartgarden.models import User, Circuit, ActivationLog, ScheduledOneTimeActivation, ScheduledActivation
 
 
 def create_user(**kwargs) -> User:
@@ -30,8 +30,8 @@ def create_circuit(**kwargs) -> Circuit:
     return circuit
 
 
-def create_activation(circuit: Circuit, **kwargs) -> Activation:
-    activation = Activation.objects.create(
+def create_activation(circuit: Circuit, **kwargs) -> ActivationLog:
+    activation = ActivationLog.objects.create(
         amount=kwargs.pop('amount', 100),
         timestamp=kwargs.pop('timestamp', datetime.datetime.now(tz=pytz.UTC)),
         circuit=circuit

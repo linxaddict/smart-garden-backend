@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from smartgarden.models import User, Circuit, Activation, ScheduledOneTimeActivation, ScheduledActivation
+from smartgarden.models import User, Circuit, ActivationLog, ScheduledOneTimeActivation, ScheduledActivation
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -9,11 +9,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'username', 'user_type']
 
 
-class ActivationSerializer(serializers.ModelSerializer):
+class ActivationLogSerializer(serializers.ModelSerializer):
     timestamp = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S')
 
     class Meta:
-        model = Activation
+        model = ActivationLog
         fields = ['amount', 'timestamp']
 
 

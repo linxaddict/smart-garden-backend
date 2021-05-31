@@ -8,16 +8,16 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET
 from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, ListCreateAPIView
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from smartgarden.mixins import ExtractCircuitMixin
-from smartgarden.models import Circuit, User, ScheduledOneTimeActivation, ScheduledActivation
+from smartgarden.models import Circuit, User, ScheduledOneTimeActivation, ScheduledActivation, ActivationLog
 from smartgarden.permissions import IsCircuitCollaboratorOnUnsafeOperations
 from smartgarden.serializers import CircuitSerializer, ScheduledActivationSerializer, \
-    ScheduledOneTimeActivationSerializer
+    ScheduledOneTimeActivationSerializer, ActivationLogSerializer
 from smartgarden.view_models import CircuitViewModel
 
 
@@ -140,3 +140,34 @@ class CircuitOneTimeActivationView(ListCreateAPIView, ExtractCircuitMixin):
             serializer.create(serializer.validated_data)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ActivationLogView(CreateAPIView):
+    serializer_class = ActivationLogSerializer
+    queryset = ActivationLog.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    @property
+    def circuit_id(self):
+        return self.circuit.pk
+
+    @property
+    def circuit(self):
+        user = User.objects.get(pk=self.request.user.pk)
+        return user.controlled_circuit
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            data=request.data,
+            many=False
+        )
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            with transaction.atomic():
+                serializer.validated_data['circuit_id'] = self.circuit_id
+                serializer.create(serializer.validated_data)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Circuit.DoesNotExist:
+            raise NotFound(detail="circuit not assigned", code=404)

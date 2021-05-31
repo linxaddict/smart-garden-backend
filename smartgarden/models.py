@@ -80,11 +80,11 @@ class CircuitCollaboration(models.Model):
         return f'{self.user}, {self.circuit}'
 
 
-class Activation(models.Model):
+class ActivationLog(models.Model):
     amount = models.IntegerField(verbose_name='amount', null=False)
     timestamp = models.DateTimeField(verbose_name='timestamp', null=False)
 
-    circuit = models.ForeignKey(Circuit, on_delete=models.CASCADE, related_name='activations')
+    circuit = models.ForeignKey(Circuit, on_delete=models.CASCADE, related_name='activation_log')
 
     def __str__(self):
         return f'{self.circuit}, {self.timestamp}, {self.amount}'

@@ -3,7 +3,7 @@ import datetime
 import pytz
 from django.core.management import BaseCommand, call_command
 
-from smartgarden.models import User, Circuit, Activation, ScheduledOneTimeActivation, ScheduledActivation
+from smartgarden.models import User, Circuit, ActivationLog, ScheduledOneTimeActivation, ScheduledActivation
 
 
 class Command(BaseCommand):
@@ -34,8 +34,8 @@ class Command(BaseCommand):
 
         return circuit
 
-    def create_activation(self, circuit: Circuit, **kwargs) -> Activation:
-        activation = Activation.objects.create(
+    def create_activation(self, circuit: Circuit, **kwargs) -> ActivationLog:
+        activation = ActivationLog.objects.create(
             amount=kwargs.pop('amount', 100),
             timestamp=kwargs.pop('timestamp', datetime.datetime.now(tz=pytz.UTC)),
             circuit=circuit
